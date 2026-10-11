@@ -1,0 +1,2 @@
+# Giữ xuống dòng kiểu LF cho mọi file văn bản (code, scene, .meta), file nhị phân được Git tự nhận biết
+* text=auto eol=lf
