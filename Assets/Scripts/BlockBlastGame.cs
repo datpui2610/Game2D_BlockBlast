@@ -70,6 +70,7 @@ namespace BlockBlast
             SetupScene();
             SoundManager.Instance.PlayMusic();
             skin = new Skin(customBlockSprites, customBackground, customLogo);
+            UIKit.Skin = skin;
             BuildUI();
             ShowHome();
         }
@@ -108,9 +109,12 @@ namespace BlockBlast
 
         void BuildBackground(Transform canvas)
         {
-            var background = UIKit.MakeImage("Background", canvas, skin.Background, Color.white, Vector2.zero,
-                Vector2.zero);
+            var sprite = skin.Background != null
+                ? skin.Background
+                : SpriteFactory.Gradient(Theme.BackgroundTop, Theme.BackgroundBottom);
+            var background = UIKit.MakeImage("Background", canvas, sprite, Color.white, Vector2.zero, Vector2.zero);
             UIKit.StretchFull(background.rectTransform);
+            if (skin.Background != null) UIKit.CoverParent(background); // ảnh thật thì không kéo méo
 
             // vài đốm sáng mờ cho nền có chiều sâu
             UIKit.MakeImage("Glow", canvas, SpriteFactory.Glow(), new Color(0.45f, 0.6f, 1f, 0.18f),
@@ -124,13 +128,7 @@ namespace BlockBlast
             var screen = UIKit.MakeRect("GameScreen", parent, ScreenSize, Vector2.zero);
 
             // thanh trên cùng: nút tạm dừng, điểm cao nhất, điểm hiện tại
-            var pause = UIKit.MakeButton("Pause", screen, Theme.Blue, new Vector2(124, 124), new Vector2(-430, 830),
-                null, 0, ShowPause);
-            var barSprite = SpriteFactory.RoundedRect(6);
-            UIKit.MakeImage("Bar", pause.transform, barSprite, Color.white, new Vector2(20, 56), new Vector2(-15, 5),
-                true);
-            UIKit.MakeImage("Bar", pause.transform, barSprite, Color.white, new Vector2(20, 56), new Vector2(15, 5),
-                true);
+            BuildPauseButton(screen, new Vector2(124, 124), new Vector2(-430, 830));
             bestText = UIKit.MakeText("Best", screen, "BEST 0", 48, Theme.Gold, new Vector2(600, 70),
                 new Vector2(0, 840));
             scoreText = UIKit.MakeText("Score", screen, "0", 124, Color.white, new Vector2(800, 150),
@@ -146,6 +144,23 @@ namespace BlockBlast
                     new Vector2((i - 1) * 345f, TrayY));
 
             return screen;
+        }
+
+        /// <summary>Nút tạm dừng: icon bánh răng nếu Skin có, không thì nút xanh với hai vạch dọc vẽ bằng code.</summary>
+        void BuildPauseButton(Transform parent, Vector2 size, Vector2 pos)
+        {
+            if (skin.SettingsIcon != null)
+            {
+                UIKit.MakeIconButton("Pause", parent, skin.SettingsIcon, size, pos, ShowPause);
+                return;
+            }
+
+            var pause = UIKit.MakeButton("Pause", parent, Theme.Blue, size, pos, null, 0, ShowPause);
+            var barSprite = SpriteFactory.RoundedRect(6);
+            UIKit.MakeImage("Bar", pause.transform, barSprite, Color.white, new Vector2(20, 56), new Vector2(-15, 5),
+                true);
+            UIKit.MakeImage("Bar", pause.transform, barSprite, Color.white, new Vector2(20, 56), new Vector2(15, 5),
+                true);
         }
 
         // ================================================================== vòng lặp

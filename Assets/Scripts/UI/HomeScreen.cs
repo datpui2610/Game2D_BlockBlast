@@ -31,8 +31,8 @@ namespace BlockBlast
 
             if (skin.Logo != null)
             {
-                var logo = UIKit.MakeImage("Logo", transform, skin.Logo, Color.white, new Vector2(900, 600),
-                    new Vector2(0, 450));
+                var logo = UIKit.MakeImage("Logo", transform, skin.Logo, Color.white, new Vector2(820, 540),
+                    new Vector2(0, 480));
                 logo.preserveAspect = true;
                 titleTiles.Add((logo.rectTransform, logo.rectTransform.anchoredPosition));
             }

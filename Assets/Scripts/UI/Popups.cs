@@ -117,7 +117,7 @@ namespace BlockBlast
             void Refresh()
             {
                 bool on = get();
-                button.image.color = on ? Theme.Green : Theme.Grey;
+                UIKit.SetButtonColor(button, on ? Theme.Green : Theme.Grey);
                 text.text = on ? "ON" : "OFF";
             }
 

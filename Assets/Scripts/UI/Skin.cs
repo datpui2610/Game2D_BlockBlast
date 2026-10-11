@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BlockBlast
@@ -13,10 +14,17 @@ namespace BlockBlast
 
         public Sprite[] Blocks { get; }
         public Sprite GreyBlock { get; }
+
+        /// <summary>Có thể null: khi đó game dùng nền chuyển màu vẽ bằng code.</summary>
         public Sprite Background { get; }
 
         /// <summary>Có thể null: khi đó màn hình chính ghép chữ BLOCK BLAST bằng các khối.</summary>
         public Sprite Logo { get; }
+
+        /// <summary>Icon bánh răng của nút tạm dừng. Có thể null: khi đó nút vẽ hai vạch dọc.</summary>
+        public Sprite SettingsIcon { get; }
+
+        readonly Dictionary<Color, Sprite> buttons = new Dictionary<Color, Sprite>();
 
         public Skin(Sprite[] customBlocks, Sprite customBackground, Sprite customLogo)
         {
@@ -27,11 +35,19 @@ namespace BlockBlast
                 var color = Theme.BlockColors[i];
                 Blocks[i] = Resolve(custom, "block_" + i, () => SpriteFactory.Block(color));
             }
-            GreyBlock = SpriteFactory.Block(Theme.Grey);
-            Background = Resolve(customBackground, "background",
-                () => SpriteFactory.Gradient(Theme.BackgroundTop, Theme.BackgroundBottom));
+            GreyBlock = Resolve(null, "block_grey", () => SpriteFactory.Block(Theme.Grey));
+            Background = Resolve(customBackground, "background");
             Logo = Resolve(customLogo, "logo");
+            SettingsIcon = Resolve(null, "icon_settings");
+
+            buttons[Theme.Green] = Resolve(null, "button_green");
+            buttons[Theme.Blue] = Resolve(null, "button_blue");
+            buttons[Theme.Orange] = Resolve(null, "button_yellow");
+            buttons[Theme.Grey] = Resolve(null, "button_grey");
         }
+
+        /// <summary>Ảnh nút ứng với màu trong Theme; null nếu không có ảnh (nút sẽ được vẽ bằng code).</summary>
+        public Sprite Button(Color color) => buttons.TryGetValue(color, out var sprite) ? sprite : null;
 
         static Sprite Resolve(Sprite custom, string resourceName, Func<Sprite> fallback = null)
         {

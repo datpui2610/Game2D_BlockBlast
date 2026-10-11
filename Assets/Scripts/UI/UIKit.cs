@@ -9,6 +9,9 @@ namespace BlockBlast
     {
         static Font font;
 
+        /// <summary>Bộ hình ảnh đang dùng, để MakeButton lấy ảnh nút. Chưa gán thì nút được vẽ bằng code.</summary>
+        public static Skin Skin { get; set; }
+
         /// <summary>Font trong Assets/Resources/BlockBlast/Font; không có thì dùng font mặc định của Unity.</summary>
         public static Font Font
         {
@@ -87,11 +90,60 @@ namespace BlockBlast
             return label;
         }
 
-        /// <summary>Nút bấm kiểu 3D, có âm click và hiệu ứng nhún. label rỗng = nút không có chữ.</summary>
+        /// <summary>
+        /// Nút bấm có âm click và hiệu ứng nhún. label rỗng = nút không có chữ.
+        /// color là một màu trong Theme: nếu Skin có ảnh nút cho màu đó thì dùng ảnh, không thì vẽ nút bằng code.
+        /// </summary>
         public static Button MakeButton(string name, Transform parent, Color color, Vector2 size, Vector2 pos,
             string label, int fontSize, Action onClick)
         {
-            var img = MakeImage(name, parent, SpriteFactory.Button(), color, size, pos, true);
+            var img = MakeImage(name, parent, null, Color.white, size, pos, true);
+            var button = MakeClickable(img, onClick);
+            SetButtonColor(button, color);
+
+            if (!string.IsNullOrEmpty(label))
+                MakeText("Label", img.transform, label, fontSize, Color.white, size, new Vector2(0, 5));
+            return button;
+        }
+
+        /// <summary>Nút chỉ gồm một icon (vd: bánh răng), không có nền.</summary>
+        public static Button MakeIconButton(string name, Transform parent, Sprite icon, Vector2 size, Vector2 pos,
+            Action onClick)
+        {
+            var img = MakeImage(name, parent, icon, Color.white, size, pos);
+            img.preserveAspect = true;
+            return MakeClickable(img, onClick);
+        }
+
+        public static void SetButtonColor(Button button, Color color)
+        {
+            var img = button.image;
+            var sprite = Skin != null ? Skin.Button(color) : null;
+            if (sprite != null)
+            {
+                img.sprite = sprite;
+                img.color = Color.white;
+                // phóng hai đầu bo tròn theo chiều cao nút để chúng không bị méo
+                img.pixelsPerUnitMultiplier = sprite.rect.height / img.rectTransform.rect.height;
+            }
+            else
+            {
+                img.sprite = SpriteFactory.Button();
+                img.color = color;
+                img.pixelsPerUnitMultiplier = 1f;
+            }
+        }
+
+        /// <summary>Phủ kín đối tượng cha nhưng giữ nguyên tỉ lệ ảnh (phần thừa bị cắt), dùng cho ảnh nền.</summary>
+        public static void CoverParent(Image img)
+        {
+            var fitter = img.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fitter.aspectRatio = img.sprite.rect.width / img.sprite.rect.height;
+        }
+
+        static Button MakeClickable(Image img, Action onClick)
+        {
             img.raycastTarget = true;
             img.gameObject.AddComponent<ButtonPress>();
 
@@ -106,9 +158,6 @@ namespace BlockBlast
                 SoundManager.Instance.Play(Sfx.Click);
                 onClick?.Invoke();
             });
-
-            if (!string.IsNullOrEmpty(label))
-                MakeText("Label", img.transform, label, fontSize, Color.white, size, new Vector2(0, 5));
             return button;
         }
 

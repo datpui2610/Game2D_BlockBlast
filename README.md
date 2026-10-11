@@ -58,20 +58,26 @@ Scripts/
 Phụ thuộc chỉ đi một chiều: `BlockBlastGame` → `UI` → `Gameplay` / `Systems`. `Gameplay` và `Systems`
 không tham chiếu ngược lên UI, nên luật chơi có thể đọc và kiểm tra độc lập với giao diện.
 
-## Thay bằng hình / âm thanh từ Figma
+## Asset
 
-Game chạy được ngay với hình vẽ bằng code. Để dùng asset export từ Figma, đặt file vào
-`Assets/Resources/BlockBlast/` với tên:
+Hình ảnh lấy từ file Figma của môn học (trang **Block crush**, link trong `link figma.txt`) và đặt trong
+`Assets/Resources/BlockBlast/`. Game tự nạp theo tên file:
 
 | File | Ý nghĩa |
 |---|---|
 | `block_0.png` … `block_6.png` | 7 khối màu: đỏ, cam, vàng, xanh lá, xanh ngọc, xanh dương, tím |
+| `block_grey.png` | khối xám khi thua (khử màu từ khối trong bộ asset) |
 | `background.png` | ảnh nền |
-| `logo.png` | logo thay cho chữ BLOCK BLAST |
-| `Font.ttf` | font chữ |
-| `Audio/Music`, `Audio/Click`, `Audio/Place`, `Audio/Clear`, `Audio/GameOver`... | âm thanh (wav/mp3/ogg) |
+| `logo.png` | logo BLOCK CRUSH ở màn hình chính |
+| `button_green.png`, `button_blue.png`, `button_yellow.png`, `button_grey.png` | nút bấm |
+| `icon_settings.png` | icon bánh răng của nút tạm dừng |
 
-Hoặc kéo sprite trực tiếp vào component **BlockBlastGame** trong scene (mục *Custom Block Sprites*).
+Thiếu file nào thì game tự vẽ phần đó bằng code (`SpriteFactory`), nên vẫn chạy được khi chưa có asset.
+Có thể thêm `Font.ttf` và âm thanh `Audio/Music`, `Audio/Click`, `Audio/Place`, `Audio/Clear`,
+`Audio/GameOver`... (wav/mp3/ogg) vào cùng thư mục; hiện tại âm thanh được tổng hợp bằng code.
+
+Ảnh thêm vào thư mục này được `Assets/Editor/BlockBlastAssetImporter.cs` tự import thành Sprite.
+Khối, nền và logo cũng có thể kéo trực tiếp vào component **BlockBlastGame** trong scene.
 
 ## Mã nguồn
 
